@@ -16,10 +16,9 @@ import {
 
 let { height, width } = Dimensions.get("window");
 
-export default class HomeView extends Component {
+export default class MeetupView extends Component {
     static navigationOptions = {
-        title: 'Welcome',
-        header: null
+        title: 'Monthly Meetup Schedule',
     };
     constructor(props) {
 		super(props);
@@ -33,9 +32,11 @@ export default class HomeView extends Component {
      render() {
 		return (
             <ScrollView
-                style={}
+                style={{
+                    color: "#fff"
+                }}
             >    
-
+                <Text>SATU HATI</Text>
             </ScrollView>
         )
      }

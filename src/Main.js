@@ -21,16 +21,26 @@ import {
 
 
 import HomeView from './view/home';
+import MeetupView from './view/meetup';
+import storage from './models/storage';
+import UserModel from './models/user';
+
 
 const FBSDK = require('react-native-fbsdk');
 const {
   LoginButton,
-  AccessToken
+  AccessToken,
+  GraphRequest,
+  GraphRequestManager
 } = FBSDK;
 let { height, width } = Dimensions.get("window");
 
 
 export default class MainView extends Component {
+    static navigationOptions = {
+        title: 'Welcome',
+        header: null
+    };
     constructor(props) {
 		super(props);
 		this.state = {
@@ -39,6 +49,11 @@ export default class MainView extends Component {
     }
     
     componentWillMount() {
+        
+
+    }
+
+    goToHomePage(){
         const resetAction = NavigationActions.reset({
         index: 0,
         actions: [
@@ -52,8 +67,39 @@ export default class MainView extends Component {
 
     render() {
 		return (
-            <View>  
-                <Text>Hello World</Text>
+            <View style={styles.container}>
+                 <StatusBar
+                  backgroundColor="#3A5999"
+                  barStyle="light-content"
+                />
+
+                <Image 
+                style={{
+                    height:121,
+                    width:118,
+                    alignSelf:"center",
+                    marginTop:15,
+                }}
+                source={require('./images/logo.png')}
+
+                />
+
+                <Image 
+                style={{
+                    height:29,
+                    width:193,
+                    alignSelf:"center",
+                    marginTop:15,
+                    marginBottom:40,
+                }}
+                source={require('./images/devc.png')}
+
+                />    
+                
+                <View
+                style={{
+                    alignSelf:"center"
+                }}>
                 <LoginButton
                 publishPermissions={["publish_actions"]}
                 onLoginFinished={
@@ -63,15 +109,65 @@ export default class MainView extends Component {
                     } else if (result.isCancelled) {
                         alert("login is cancelled.");
                     } else {
-                        AccessToken.getCurrentAccessToken().then(
-                        (data) => {
-                            alert(data.accessToken.toString())
-                        }
-                        )
+                        let tmpThis = this;
+
+                        AccessToken.getCurrentAccessToken().then(data => {
+                            if (!data) {
+                            console.warn('No access token available');
+                            } else {
+                                console.log(`Got access token ${data.accessToken}`);
+                                console.log(`Permissions ${data.permissions}`);
+                                const graphPath = '/me?fields=id,first_name,picture{url}';
+                                const requestHandler = (error, result) => {
+                                    if (!error) {
+                                        console.log(
+                                            `Result is ${result.id}, ${result.first_name}, ${result
+                                            .picture.data.url}`
+                                        );
+                                        const user = new UserModel(
+                                            result.id,
+                                            result.first_name,
+                                            result.picture.data.url
+                                        );
+                                        console.log('USERRRR', user);
+                                        storage.save({
+                                            key: 'user',
+                                            data: {
+                                            user: {
+                                                id: user.id,
+                                                firstName: user.firstName,
+                                                profileImageUri: user.profileImageUri
+                                            }
+                                            }
+                                        });
+
+                                        tmpThis.goToHomePage();
+                                    }
+                                }
+
+                                const userInfoRequest = new GraphRequest(
+                                    graphPath,
+                                    null,
+                                    requestHandler
+                                );
+                                new GraphRequestManager().addRequest(userInfoRequest).start();
+
+
+                            }
+                        });
+                        
                     }
                     }
                 }
                 onLogoutFinished={() => alert("logout.")}/>
+                </View>
+                <Text
+                style={{
+                    alignSelf:"center",
+                    color:"#fff",
+                    marginTop:15
+                }}
+                >I don't have a facebook account</Text>
             </View>
 
         );
@@ -80,10 +176,33 @@ export default class MainView extends Component {
 
 }
 
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#3A5999',
+        padding:25,
+        height: height,
+        width: width,
+
+    },
+
+    subTitle: {
+        fontSize: 20,
+        color: '#fff',
+        fontFamily: 'Freight-Sans-Bold',
+
+    },
+
+    quickStartContainer: {
+        marginTop:15
+    }
+  
+});
+
 const fbdevc = StackNavigator(
     {
     Main: { screen: MainView },
-    Home: { screen: HomeView }
+    Home: { screen: HomeView },
+    Meetup: { screen: MeetupView},
     },{ 
         headerMode: 'screen' 
     } 
