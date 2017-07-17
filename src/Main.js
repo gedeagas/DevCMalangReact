@@ -161,13 +161,16 @@ export default class MainView extends Component {
                 }
                 onLogoutFinished={() => alert("logout.")}/>
                 </View>
-                <Text
-                style={{
-                    alignSelf:"center",
-                    color:"#fff",
-                    marginTop:15
-                }}
-                >I don't have a facebook account</Text>
+                <TouchableOpacity onPress={this.goToHomePage.bind(this)}> 
+                    <Text
+                    style={{
+                        alignSelf:"center",
+                        color:"#fff",
+                        marginTop:15
+                    }}
+                    >I don't have a facebook account</Text>
+                </TouchableOpacity>
+                
             </View>
 
         );

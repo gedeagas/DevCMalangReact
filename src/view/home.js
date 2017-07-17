@@ -98,7 +98,11 @@ export default class HomeView extends Component {
                 <Text style={styles.subTitle}>Quick Start</Text>
 
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.quickStartContainer}>
-                    <TouchableOpacity> 
+                    <TouchableOpacity
+                    onPress={() =>
+                        navigate('Meetup', { name: 'Jane' })
+                    }
+                    > 
                         <QuickStartComp title={"Monthly Meetup Schedule"}/>
                     </TouchableOpacity>
                     <QuickStartComp title={"Special Event Schedule"}/>
